@@ -55,12 +55,13 @@ class Locations(object):
                     f.write('{}\t{}\n'.format(SKU, self.coils[device][SKU]['QTY']))
             if self.reports:
                 for line in self.reports[device]:
-                    f.write('{}\t{}\n'.format(
-                        line['productNum1'],
-                        int(line['packageQty']) * int(line['qtyDispensed'])
-                    ))
+                    if 'productNum1' in line.keys():  # offline vends may leave blanks, ignored by vending tab.
+                        f.write('{}\t{}\n'.format(
+                            line['productNum1'],
+                            int(line['packageQty']) * int(line['qtyDispensed'])
+                        ))
 
 if __name__ == '__main__':
     # Locations(('STOREFLJA5', 'password'))
-    Locations(('FastenalFLBRK', 'password'), dates=('08/03/2013', '08/07/2013'), customers=('cemex',))
+    Locations(('FastenalFLPER', 'fastenal3'), dates=('07/23/2013', '08/15/2013'), customers=('chemring',))
     # Locations(('FastenalFLPER', 'fastenal3'), dates=('06/27/2013', '07/30/2013'))
