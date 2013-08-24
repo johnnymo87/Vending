@@ -1,13 +1,19 @@
 __author__ = 'johnnymo87'
 from ApexScrape import *
+from datetime import timedelta
 import string
 
 
 class Locations(object):
 
-    def __init__(self, login, customers=(), dates=()):
+    def __init__(self, login, customers=(), dates=(), time=''):
+        """datetime format: mm/dd/YYYY HH:MM:SS (24 hour)"""
         self.branch = Apex(login)
         self.dates = dates
+        self.time = time
+        if time:
+            stamp = "{} {}".format(dates[0], time)
+            self.stamp = datetime.strptime(stamp, "%m/%d/%Y %H:%M:%S")
         if customers:
             self.customers = customers
         else:
@@ -42,11 +48,42 @@ class Locations(object):
                 self.coils[d] = self.branch.getCoils(d)
 
     def assembleUsage(self):
-        if self.dates:
+        if self.stamp:
+            # use usage summary for all days except first day
+            second_day = self.stamp + timedelta(days=1)
+            second_day = self.stamp.strftime("%m/%d/%Y")
+            for cust in self.devices:
+                for d in self.devices[cust]:
+                    self.reports[d] = []
+                    summary = self.branch.getUsage(d, second_day, self.dates[1])
+                    for line in summary:
+                        if 'productNum1' in line.keys():  # offline vends may leave blanks, ignored by vending tab.
+                            self.reports[d].append(
+                                (line['productNum1'], int(line['packageQty']) * int(line['qtyDispensed']))
+                            )
+            # use transaction detail for first day, only append records after stamp
+            report = []
+            for cust in self.devices:
+                for d in self.devices[cust]:
+                    report = self.branch.getReport(d, self.dates[0], self.dates[0])
+                    print 'Looking for records after ' + self.time
+                    for r in report:
+                        # r = (datetime, SKU, QTY)
+                        if r[0] >= self.stamp:
+                            record = (r[1], r[2])
+                            self.reports[d].append(record)
+        elif self.dates:
             assert len(self.dates[0]) == 10 and len(self.dates[1]) == 10
             for cust in self.devices:
                 for d in self.devices[cust]:
-                    self.reports[d] = self.branch.getUsage(d, self.dates[0], self.dates[1])
+                    self.reports[d] = []
+                    summary = self.branch.getUsage(d, self.dates[0], self.dates[1])
+                    for line in summary:
+                        if 'productNum1' in line.keys():  # offline vends may leave blanks, ignored by vending tab.
+                            self.reports[d].append(
+                                line['productNum1'],
+                                int(line['packageQty']) * int(line['qtyDispensed'])
+                            )
 
     def write(self, filename, device):
         with open(filename + '.txt', 'w') as f:
@@ -55,13 +92,9 @@ class Locations(object):
                     f.write('{}\t{}\n'.format(SKU, self.coils[device][SKU]['QTY']))
             if self.reports:
                 for line in self.reports[device]:
-                    if 'productNum1' in line.keys():  # offline vends may leave blanks, ignored by vending tab.
-                        f.write('{}\t{}\n'.format(
-                            line['productNum1'],
-                            int(line['packageQty']) * int(line['qtyDispensed'])
-                        ))
+                        f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
     # Locations(('STOREFLJA5', 'password'))
-    Locations(('FastenalFLPER', 'fastenal3'), dates=('07/23/2013', '08/15/2013'), customers=('chemring',))
+    Locations(('FastenalFLJA5', 'password'), customers=('plastic',), dates=('07/31/2013', '08/01/2013'), time='12:00:00')
     # Locations(('FastenalFLPER', 'fastenal3'), dates=('06/27/2013', '07/30/2013'))
