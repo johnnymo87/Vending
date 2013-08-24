@@ -48,7 +48,8 @@ class Locations(object):
                 self.coils[d] = self.branch.getCoils(d)
 
     def assembleUsage(self):
-        if self.stamp:
+        # Not DRY, don't care right now
+        if self.time:
             # use usage summary for all days except first day
             second_day = self.stamp + timedelta(days=1)
             second_day = self.stamp.strftime("%m/%d/%Y")
@@ -88,13 +89,19 @@ class Locations(object):
     def write(self, filename, device):
         with open(filename + '.txt', 'w') as f:
             for SKU in self.coils[device]:
-                if self.coils[device][SKU]['QTY'] > 0:
+                if '[' in SKU:
+                    QTY = self.coils[device][SKU]['QTY']
+                    SKU = re.search('[\d\w-]+', SKU).group()
+                    f.write('{}\t{}\n'.format(SKU, QTY))
+                elif self.coils[device][SKU]['QTY'] > 0:
                     f.write('{}\t{}\n'.format(SKU, self.coils[device][SKU]['QTY']))
             if self.reports:
                 for line in self.reports[device]:
-                        f.write('{}\t{}\n'.format(line[0], line[1]))
+                    if '[' in line[0]:
+                        line[0] = re.search('[\d\w-]+', line[0]).group()
+                    f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
-    # Locations(('STOREFLJA5', 'password'))
-    Locations(('FastenalFLJA5', 'password'), customers=('plastic',), dates=('07/31/2013', '08/01/2013'), time='12:00:00')
+    Locations(('JohnJernigan', 'password'), customers=('auto',))
+    # Locations(('FastenalFLJA5', 'password'), customers=('plastic',), dates=('07/31/2013', '08/01/2013'), time='12:00:00')
     # Locations(('FastenalFLPER', 'fastenal3'), dates=('06/27/2013', '07/30/2013'))
