@@ -5,6 +5,7 @@ import BeautifulSoup
 import re
 from collections import OrderedDict
 import HTMLParser
+from datetime import datetime
 
 
 class Apex(object):
@@ -150,14 +151,14 @@ class Apex(object):
         return parts
 
     def getReport(self, device, beginDate, endDate):
-        """Assembles transaction report, returns list of (descrip, SKU, QTY)"""
+        """Assembles transaction report, returns list of (stamp, SKU, QTY), newest records on top"""
         print 'Getting report for', device, 'for', beginDate, 'through', endDate
         report = []
         params = OrderedDict((
             ('page', 1),
             ('beginDate', beginDate),
             ('endDate', endDate),
-            ('checkBoxFileds', 'SKU|ProductNum1,Quantity Dispensed|QtyDispensed,Package Qty|PackageQty'),
+            ('checkBoxFileds', 'Date|ActionDate,Product SKU|ProductNum1,Quantity Dispensed|QtyDispensed,Package Qty|PackageQty'),
             ('companyId', self.devices[device][0]),
             ('siteIdTmp', self.devices[device][1]),
             ('deviceId', self.devices[device][2]),
@@ -177,13 +178,16 @@ class Apex(object):
             p += 1
             for j in range(1, lines + 1):
                 row = soup.contents[1].contents[j]
-                SKU = re.search('[\d-]+\[?', str(row.contents[0].contents[0]))
-                dispense = re.search('[\d]+', str(row.contents[1].contents[0]))
-                pkg = re.search('[\d]+', str(row.contents[2].contents[0]))
-                if SKU and dispense and pkg:
+                stamp = re.search('[\d\- :]+', str(row.contents[0].contents[0]))
+                SKU = re.search('[\d-]+\[?', str(row.contents[1].contents[0]))
+                dispense = re.search('[\d]+', str(row.contents[2].contents[0]))
+                pkg = re.search('[\d]+', str(row.contents[3].contents[0]))
+                if stamp and SKU and dispense and pkg:
+                    stamp = stamp.group().strip()
+                    stamp = datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S")
                     SKU = str(SKU.group())
                     QTY = str(int(dispense.group()) * int(pkg.group()))
-                    report.append((SKU, QTY))
+                    report.append((stamp, SKU, QTY))
                 else:
                     print 'Data missing on page ' + str(p) + ', line ' + str(j)
             params['page'] += 1
