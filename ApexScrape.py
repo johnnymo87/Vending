@@ -73,13 +73,13 @@ class Apex(object):
                 names.append(o['deviceName'])
         return names
 
-    def getPkgQty(self, device):
-        print 'Getting package quantities for', device
+    def getPkgQty(self, siteId):
+        print 'Getting package quantities for', siteId
         pkgQty = {}
         params = OrderedDict((
             ('page', 1),
-            ('companyId', self.devices[device][0]),
-            ('siteId', self.devices[device][1])
+            ('companyId', self.comId),
+            ('siteId', siteId)
         ))
         request = self.s.get("https://fastsolutions.mroadmin.com/ProductManager/product_listSiteProductAjax.action", params=params)
         data = request.content.split('|')
@@ -102,7 +102,7 @@ class Apex(object):
         return pkgQty
 
     def getCoils(self, device):
-        pkgQty = self.getPkgQty(device)
+        pkgQty = self.getPkgQty(self.devices[device][1])
         print 'Getting coils for', device
         parts = {}
         params = OrderedDict((
@@ -179,7 +179,7 @@ class Apex(object):
             for j in range(1, lines + 1):
                 row = soup.contents[1].contents[j]
                 stamp = re.search('[\d\- :]+', str(row.contents[0].contents[0]))
-                SKU = re.search('[\d-]+\[?', str(row.contents[1].contents[0]))
+                SKU = re.search('[\d\w\[\]-]+', str(row.contents[1].contents[0]))
                 dispense = re.search('[\d]+', str(row.contents[2].contents[0]))
                 pkg = re.search('[\d]+', str(row.contents[3].contents[0]))
                 if stamp and SKU and dispense and pkg:
