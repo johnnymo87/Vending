@@ -70,7 +70,43 @@ class RecordCount(object):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     # insert store logins
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> 468a53c8734d607079bc95f2cd332de475f87e5a
 
     RecordCount(stores)
 
