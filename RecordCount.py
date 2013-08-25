@@ -70,39 +70,7 @@ class RecordCount(object):
 
 
 if __name__ == '__main__':
-    stores = OrderedDict((
-        ('FLPER', ('FastenalFLPER', 'fastenal3')),
-        ('FLCRY', ('branchflcry', 'flcry8975')),
-        ('FLBRK', ('FastenalFLBRK', 'password')),
-        ('FLLAC', ('STOREFLLAC', 'fllacice')),
-        ('FLGAN', ('FLGANStore', 'password')),
-        ('FLGA1', ('FastenalFLGA1', 'password')),
-        ('FLOCA', ('SteveMcMillen', 'password')),
-        ('FLOC1', ('branchfloc1', 'k45lm2mf')),
-        ('FL002', ('SantosBaez1', 'fastenal')),
-        ('FLBEE', ('STOREFLBEE', 'password')),
-        ('FLLEE', ('FastenalFLLEE', 'password')),
-        ('FLTAV', ('FastenalFLTAV', '123456')),
-        ('FLPAA', ('STOREFLPAA', 'password')),
-        ('FLJA1', ('Nhodges', 'password')),
-        ('FLJA2', ('STOREFLJA2', 'password')),
-        ('FLJA3', ('FastenalFLJA3', '16Dutton')),
-        ('FLJA4', ('STOREFLJA4', 'support')),
-        ('FLJA6', ('FASTENALFLJA6', '7033Commonwealth')),
-        ('FLFER', ('FastenalFLFER', 'number1')),
-        ('GAWA1', ('BranchGAWA1', 'password')),
-        ('GABRU', ('JohnJernigan', 'password')),
-        ('FLJA5', ('FastenalFLJA5', 'password')),
-        ('FLJAC', ('FastFLJAC', 'password')),
-        ('FLGRE', ('branchflgre', 'fastenal')),
-        ('FLSTA', ('fastenalflsta', '06749gon')),
-        ('FLORM', ('STOREFLORM', 'password')),
-        ('FLSAN', ('FastenalFLSAN', 'password')),
-        ('FLLON', ('FastenalFLLON', 'Boltandnut1')),
-        ('FLOR1', ('FastenalFLOR1', 'password')),
-        ('FLOR6', ('FastFLOR6', 'password')),
-        ('FLEDG', ('FastenalFLEDG', 'password'))
-    ))
+    # insert store logins
 
     RecordCount(stores)
 

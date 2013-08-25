@@ -68,14 +68,21 @@ def output(self, filename, data, write_mode):
 
 
 if __name__ == '__main__':
-    login = ('FastenalFLSAR', 'sarasota')
-    customer = 'alfa'
+    #LABELS
+    login = ('FastenalFLJA5', 'password')
+    customer = 'metal'
     labels = Labels(login, customer)
-##    with open(customer + '.txt', 'w') as quote:
-##        quote.write('')
     for dev in labels.devices:
         data = labels.getCoils(dev)
         with open(customer + ' ' + dev + '.txt', 'w') as quote:
             for line in data:
-##                quote.write('{}\t{}\n'.format(line[1], '1'))
                 quote.write('{}\t{}\t{}\n'.format(line[0], line[1], line[2]))
+    #QUOTE
+##    login = ('FLGANStore', 'password')
+##    customer = 'boone'
+##    labels = Labels(login, customer)
+##    for dev in labels.devices:
+##        data = labels.getCoils(dev)
+##        with open(customer + ' ' + dev + '.txt', 'w') as quote:
+##            for line in data:
+##                quote.write('{}\t{}\n'.format(line[1], '1'))

