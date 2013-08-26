@@ -82,8 +82,7 @@ class Locations(object):
                     for line in summary:
                         if 'productNum1' in line.keys():  # offline vends may leave blanks, ignored by vending tab.
                             self.reports[d].append(
-                                line['productNum1'],
-                                int(line['packageQty']) * int(line['qtyDispensed'])
+                                (line['productNum1'], int(line['packageQty']) * int(line['qtyDispensed']))
                             )
 
     def write(self, filename, device):
@@ -98,10 +97,11 @@ class Locations(object):
             if self.reports:
                 for line in self.reports[device]:
                     if '[' in line[0]:
-                        line[0] = re.search('[\d\w-]+', line[0]).group()
+                        new_SKU = re.search('[\d\w-]+', line[0]).group()
+                        line = (new_SKU, line[1]) # 'tuple' object does not support item assignment, must overwite
                     f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
-    Locations(('JohnJernigan', 'password'), customers=('auto',))
-    # Locations(('FastenalFLJA5', 'password'), customers=('plastic',), dates=('07/31/2013', '08/01/2013'), time='12:00:00')
-    # Locations(('FastenalFLPER', 'fastenal3'), dates=('06/27/2013', '07/30/2013'))
+    # Locations(('JohnJernigan', 'password'), customers=('auto',))
+    Locations(('FastenalFLPER', 'fastenal3'), customers=('chemring',), dates=('08/19/2013', '08/26/2013'), time='09:57:00')
+    # Locations(('FastenalFLPER', 'fastenal3'), customers=('aluminum',), dates=('07/31/2013', '08/26/2013'))

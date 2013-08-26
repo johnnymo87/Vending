@@ -69,8 +69,8 @@ def output(self, filename, data, write_mode):
 
 if __name__ == '__main__':
     #LABELS
-    login = ('FastenalFLJA5', 'password')
-    customer = 'metal'
+    login = ('SteveMcMillen', 'password')
+    customer = 'closet'
     labels = Labels(login, customer)
     for dev in labels.devices:
         data = labels.getCoils(dev)
