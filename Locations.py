@@ -52,7 +52,7 @@ class Locations(object):
         if self.time:
             # use usage summary for all days except first day
             second_day = self.stamp + timedelta(days=1)
-            second_day = self.stamp.strftime("%m/%d/%Y")
+            second_day = second_day.strftime("%m/%d/%Y")
             for cust in self.devices:
                 for d in self.devices[cust]:
                     self.reports[d] = []
@@ -102,6 +102,7 @@ class Locations(object):
                     f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
-    # Locations(('JohnJernigan', 'password'), customers=('auto',))
-    Locations(('FastenalFLPER', 'fastenal3'), customers=('chemring',), dates=('08/19/2013', '08/26/2013'), time='09:57:00')
-    # Locations(('FastenalFLPER', 'fastenal3'), customers=('aluminum',), dates=('07/31/2013', '08/26/2013'))
+    # Locations(('FastenalFLJA2', 'password'), customers=('cornerstone',))
+    Locations(('FastenalFLTAV', '123456'), customers=('Wolverine',), dates=('08/30/2013', '09/03/2013'), time='18:00:00')
+##    for customer in ['Technical Painting','Enkei', 'Tampa Armature Works']:
+##        Locations(('STOREFLJA2', 'password'), customers=(customer,), dates=('08/16/2013', '08/31/2013'))
