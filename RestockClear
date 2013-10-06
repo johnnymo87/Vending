@@ -1,0 +1,26 @@
+require 'mechanize'
+require 'json'
+require 'nokogiri'
+require 'crack'
+
+browser = Mechanize.new
+# login
+url = 'https://fastsolutions.mroadmin.com/APEX-Login/account_login.action'
+login_data = {'user.login_id' => 'FLGANStore', 'user.password' => 'password'}
+response = browser.post url, login_data
+puts response.code.to_i == 200 ? 'login successful' : 'login failed'
+
+# restock display in inbox
+url = 'https://fastsolutions.mroadmin.com/APEX-Login/inbox_restockInfoAlert.action'
+form_data = {
+    'actionSequence' => '13',
+    'RequestId' => 'undefined',
+    'newSortColumn' => '0',
+    'oldSortColumn' => '0',
+    'sortFlag' => 'null',
+    'sortCancel' => '0'
+}
+
+response = browser.post url, form_data
+puts response.body
+#puts Crack::JSON.parse(response.body)

@@ -2,10 +2,26 @@ require 'sinatra'
 require 'mechanize'
 require 'json'
 
+require 'csv'
+
+class CSVParser < Mechanize::File
+  attr_reader :csv
+
+  def initialize uri = nil, response = nil, body = nil, code = nil
+    super uri, response, body, code
+    @csv = CSV.parse body
+  end
+end
+
 class Apex
   def initialize
     @browser = Mechanize.new
+    @search_fields = 'Motor Position|MotorPosition,Product SKU|ProductNum1,Quantity Dispensed|QtyDispensed,Unit Price|SymbolCodeUnitPrice,Package Qty|PackageQty'
   end
+
+  attr_accessor :search_fields
+  attr_reader :browser, :store, :customers, :machines
+
 
   def login(username, password)
     url = 'https://fastsolutions.mroadmin.com/APEX-Login/account_login.action'
@@ -142,35 +158,20 @@ class Apex
     counts
   end
 
-  def find_transaction_details(site_id, device_id, begin_date, end_date)
-    transactions = []
+  def find_transaction_details(begin_date, end_date, site_id='', device_id='')
     url = 'https://fastsolutions.mroadmin.com/ReportManager/transactionReportAction_viewTransaction.action'
-    params = {'page' => 1, 'beginDate' => begin_date, 'endDate' => end_date,
-              'checkBoxFileds' => 'Date|ActionDate,Product SKU|ProductNum1,Quantity Dispensed|QtyDispensed,Package Qty|PackageQty',
+    params = {'page' => 1, 'beginDate' => begin_date, 'endDate' => end_date, 'checkBoxFileds' => @search_fields,
               'companyId' => @store, 'sideIdTmp' => site_id, 'deviceId' => device_id, 'searchFlag' => 'SEARCH', 'companyType' => 'OWNER'}
-    response = @browser.get(url, params).content
-    response = JSON.parse(response)[0]['showPageData']
-    response = Nokogiri::HTML(response)
-    pages = response.at_css('#pageLinknull').content
-    pages = pages.scan(/\w+/)[4].to_i
-    (0...pages).each do
-      rows = response.css('.stripe_tb tr')
-      rows.each do |row|
-        columns = row.css('td')
-        record = []
-        (0...columns.length).each do |i|
-          record << columns[i].content.strip
-        end
-        transactions << record
-      end
-      params['page'] += 1
-      response = @browser.get(url, params).content
-      response = JSON.parse(response)[0]['showPageData']
-      response = Nokogiri::HTML(response)
-    end
-    transactions = transactions[0...-2]
-    transactions
+    @browser.get(url, params)
+    url = 'https://fastsolutions.mroadmin.com/ReportManager/transactionReportAction_downLoadCsv.action'
+    params = {'hierarchyCd' => 'undefined', 'nodeId' => 'undefined', 'beginDate' => begin_date, 'endDate' => end_date,
+              'companyId' => @store, 'siteIdTmp' => site_id, 'deviceId' => device_id, 'searchFlag' => 'SEARCH',
+              'checkBoxFileds' => @search_fields,
+              'companyType' => 'OWNER', 'searchBy' => 'sku'}
+    @browser.pluggable_parser.csv = CSVParser
+    @browser.get(url, params).content
   end
+
 
   def find_transaction_summary(site_id, device_id, begin_date, end_date)
     url = 'https://fastsolutions.mroadmin.com/ReportManager/usageReportAction_getOwnerReportByDeviceBinValue.action'
