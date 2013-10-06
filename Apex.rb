@@ -169,7 +169,7 @@ class Apex
               'checkBoxFileds' => @search_fields,
               'companyType' => 'OWNER', 'searchBy' => 'sku'}
     @browser.pluggable_parser.csv = CSVParser
-    @browser.get(url, params).content
+    CSV.parse @browser.get(url, params).content
   end
 
 
