@@ -150,6 +150,33 @@ class Apex(object):
                 print 'Data missing from position ' + str(int(float(row.contents[1].contents[0])))
         return parts
 
+    def getCoils10k(self, device):
+        pkgQty = self.getPkgQty(self.devices[device][1])
+        params = OrderedDict((
+            ('device.deviceId', a.devices[device][2]),
+            ('siteType', 'owner')
+        ))
+        request = self.s.post("https://fastsolutions.mroadmin.com/Apex-Device/megaStoreAction_getMegastoreTree.action", params=params)
+
+        parts = {}
+        data = json.loads(request.content)
+        soup = BeautifulSoup.BeautifulSoup(data['megastoreTree'])
+        tables = soup.findAll('table')
+        for tab in tables:
+            rows=tab.tbody.findAll('tr')
+            for ro in rows:
+                try:
+                    # unassigned skus are found as ''
+                    if ro.findAll('td')[3].text:
+                        #sku, count = col3, col4
+                        SKU = ro.findAll('td')[3].text
+                        QTY = int(ro.findAll('td')[4].text)
+                        parts[SKU] = pkgQty[SKU] * QTY
+                except:
+                    # only superfluous padding raises an exception
+                    continue
+        return parts
+
     def getReport(self, device, beginDate, endDate):
         """Assembles transaction report, returns list of (stamp, SKU, QTY), newest records on top"""
         print 'Getting report for', device, 'for', beginDate, 'through', endDate
@@ -229,4 +256,4 @@ class Apex(object):
             f.writelines('\t'.join(i) + '\n' for i in data)
 
 if __name__ == '__main__':
-    FLJA1 = Apex(('Nhodges', 'password'))
+    a = Apex(('username', 'password'))
