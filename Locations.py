@@ -6,8 +6,9 @@ import string
 
 class Locations(object):
 
-    def __init__(self, login, customers=(), dates=(), time=''):
+    def __init__(self, login, customers=(), dates=(), time='', megastore=False):
         """datetime format: mm/dd/YYYY HH:MM:SS (24 hour)"""
+        self.megastore = megastore
         self.branch = Apex(login)
         self.dates = dates
         self.time = time
@@ -45,7 +46,10 @@ class Locations(object):
         """Makes a dictionary of dictionaries"""
         for cust in self.devices:
             for d in self.devices[cust]:
-                self.coils[d] = self.branch.getCoils(d)
+                if self.megastore:
+                    self.coils[d] = self.branch.getCoils10k(d)
+                else:
+                    self.coils[d] = self.branch.getCoils(d)
 
     def assembleUsage(self):
         # Not DRY, don't care right now
@@ -67,7 +71,7 @@ class Locations(object):
             for cust in self.devices:
                 for d in self.devices[cust]:
                     report = self.branch.getReport(d, self.dates[0], self.dates[0])
-                    print 'Looking for records after ' + self.time
+                    print 'Looking for records on or after ' + self.time
                     for r in report:
                         # r = (datetime, SKU, QTY)
                         if r[0] >= self.stamp:
@@ -102,7 +106,7 @@ class Locations(object):
                     f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
-    # Locations(('FastenalFLJA2', 'password'), customers=('cornerstone',))
-    Locations(('FastenalFLTAV', '123456'), customers=('Wolverine',), dates=('08/30/2013', '09/03/2013'), time='18:00:00')
-##    for customer in ['Technical Painting','Enkei', 'Tampa Armature Works']:
-##        Locations(('STOREFLJA2', 'password'), customers=(customer,), dates=('08/16/2013', '08/31/2013'))
+##    Locations(('STOREFLLAC', 'fllacice'), customers=('Cold Storage',))
+    Locations(('STOREFLLAC', 'fllacice'), customers=('ONeal',), dates=('10/21/2013', '10/24/2013'), time='06:59:54')
+##    for customer in ['Bacardi','Braddock', 'Emerson','Enkei','Jacksonville Port Authority','Tampa Armature Works','Technical Painting']:
+##        Locations(('STOREFLJA2', 'password'), customers=(customer,), dates=('10/16/2013', '10/17/2013'))
