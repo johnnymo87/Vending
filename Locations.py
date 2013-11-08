@@ -93,11 +93,11 @@ class Locations(object):
         with open(filename + '.txt', 'w') as f:
             for SKU in self.coils[device]:
                 if '[' in SKU:
-                    QTY = self.coils[device][SKU]['QTY']
+                    QTY = self.coils[device][SKU]
                     SKU = re.search('[\d\w-]+', SKU).group()
                     f.write('{}\t{}\n'.format(SKU, QTY))
-                elif self.coils[device][SKU]['QTY'] > 0:
-                    f.write('{}\t{}\n'.format(SKU, self.coils[device][SKU]['QTY']))
+                elif self.coils[device][SKU] > 0:
+                    f.write('{}\t{}\n'.format(SKU, self.coils[device][SKU]))
             if self.reports:
                 for line in self.reports[device]:
                     if '[' in line[0]:
@@ -106,7 +106,7 @@ class Locations(object):
                     f.write('{}\t{}\n'.format(line[0], line[1]))
 
 if __name__ == '__main__':
-##    Locations(('STOREFLLAC', 'fllacice'), customers=('Cold Storage',))
-    Locations(('STOREFLLAC', 'fllacice'), customers=('ONeal',), dates=('10/21/2013', '10/24/2013'), time='06:59:54')
+    Locations(('STOREFLJA2', 'password'), customers=('10k',), megastore=True)
+##    Locations(('FastenalFLLEE', 'password'), customers=('Advanced Millwork',), dates=('10/26/2013', '10/30/2013'), time='06:43:03')
 ##    for customer in ['Bacardi','Braddock', 'Emerson','Enkei','Jacksonville Port Authority','Tampa Armature Works','Technical Painting']:
-##        Locations(('STOREFLJA2', 'password'), customers=(customer,), dates=('10/16/2013', '10/17/2013'))
+##        Locations(('STOREFLJA2', 'password'), customers=(customer,))
